@@ -36,6 +36,10 @@ export const selectNodeContents = (node: HTMLElement | null, start?: number, end
 };
 
 export const removeAllSelections = () => {
+  if (!window.getSelection) {
+    return;
+  }
+
   const selection = window.getSelection();
   if (selection !== null) {
     try {

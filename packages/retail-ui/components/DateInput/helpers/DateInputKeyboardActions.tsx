@@ -22,10 +22,10 @@ export enum Actions {
   CopyValue,
 }
 
-const extractAction = new KeyboardActionExctracterBuilder()
-  .add(Actions.PasteValue, e => (e.ctrlKey || e.metaKey) && e.key === 'v')
-  .add(Actions.CopyValue, e => (e.ctrlKey || e.metaKey) && e.key === 'c')
-  .add(Actions.FullSelection, e => (e.ctrlKey || e.metaKey) && e.key === 'a')
+const extractAction = new KeyboardActionExctracterBuilder<Actions>()
+  .add(Actions.PasteValue, e => (e.ctrlKey || e.metaKey) && e.keyCode === 86)
+  .add(Actions.CopyValue, e => (e.ctrlKey || e.metaKey) && e.keyCode === 67)
+  .add(Actions.FullSelection, e => (e.ctrlKey || e.metaKey) && e.keyCode === 65)
   .add(Actions.Ignore, e => isModified(e) || isFKeys(e) || e.key === 'Tab')
   .add(Actions.MoveSelectionLeft, e => e.key === 'ArrowLeft')
   .add(Actions.MoveSelectionRight, e => e.key === 'ArrowRight')

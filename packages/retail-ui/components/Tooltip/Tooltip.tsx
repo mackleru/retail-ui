@@ -133,7 +133,7 @@ export interface TooltipProps {
   disableAnimations: boolean;
 
   /**
-   * Использовать обертку над children в виде <span />
+   * Использовать обертку над children в виде `<span />`
    * @default true
    */
   useWrapper: boolean;

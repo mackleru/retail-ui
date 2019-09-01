@@ -4,20 +4,24 @@ enum MouseDragEventType {
   MouseDragEnd = 'mousedragend',
 }
 
+interface MouseDragEvent extends MouseEvent { }
+
 export default class MouseDrag {
   // Радиус окружности, который необходимо преодолеть мышью, чтобы вызвалось событие `MouseDragStart`
   public static readonly RADIUS: number = 5; // px
 
   public static listen = (elem: HTMLElement) => new MouseDrag(elem);
 
-  private mouseDragEvent?: MouseEvent;
+  private mouseDragStartEvent?: MouseDragEvent;
   private clicked = false;
   private dragging = false;
   private x1?: number;
 
   private y1?: number;
+  private readonly elem: HTMLElement;
 
   public constructor(elem: HTMLElement) {
+    this.elem = elem;
     elem.removeEventListener('mousedown', this.handleMouseDown);
     elem.removeEventListener('mousemove', this.handleMouseMove);
     elem.removeEventListener('mouseup', this.handleMouseUp);
@@ -31,23 +35,19 @@ export default class MouseDrag {
       this.clicked = true;
       this.x1 = event.pageX;
       this.y1 = event.pageY;
-      this.mouseDragEvent = this.createEvent(MouseDragEventType.MouseDragStart, event);
+      this.mouseDragStartEvent = this.createEvent(MouseDragEventType.MouseDragStart, event);
     }
   };
 
   private handleMouseMove = (event: MouseEvent) => {
     if (this.dragging) {
-      if (event.target !== null) {
-        event.target.dispatchEvent(this.createEvent(MouseDragEventType.MouseDragMove, event));
-      }
+      return this.dispatchEvent(this.createEvent(MouseDragEventType.MouseDragMove, event), event);
     }
-    if (this.clicked && !this.dragging && this.getLength(event.pageX, event.pageY) > MouseDrag.RADIUS) {
+    if (this.clicked && this.getLength(event.pageX, event.pageY) > MouseDrag.RADIUS) {
       this.dragging = true;
       this.clicked = false;
-      if (event.target !== null && this.mouseDragEvent) {
-        event.target.dispatchEvent(this.mouseDragEvent);
-        event.preventDefault();
-        event.stopImmediatePropagation();
+      if (this.mouseDragStartEvent) {
+        this.dispatchEvent(this.mouseDragStartEvent, event);
       }
     }
   };
@@ -56,11 +56,7 @@ export default class MouseDrag {
     this.clicked = false;
     if (this.dragging) {
       this.dragging = false;
-      if (event.target !== null) {
-        event.target.dispatchEvent(this.createEvent(MouseDragEventType.MouseDragEnd, event));
-        event.preventDefault();
-        event.stopImmediatePropagation();
-      }
+      this.dispatchEvent(this.createEvent(MouseDragEventType.MouseDragEnd, event), event);
     }
   };
 
@@ -68,7 +64,7 @@ export default class MouseDrag {
     return this.x1 !== undefined && this.y1 !== undefined ? Math.sqrt((x2 - this.x1) ** 2 + (y2 - this.y1) ** 2) : 0;
   };
 
-  private createEvent = (type: MouseDragEventType, event: MouseEvent) => {
+  private createEvent = (type: MouseDragEventType, event: MouseEvent): MouseDragEvent => {
     if (typeof MouseEvent === 'function') {
       return new MouseEvent(type, event);
     }
@@ -76,5 +72,11 @@ export default class MouseDrag {
     const e = document.createEvent('MouseEvent');
     e.initEvent(type, true, true);
     return e;
+  };
+
+  private dispatchEvent = (mouseDragEvent: MouseDragEvent, event: MouseEvent): void => {
+    this.elem.dispatchEvent(mouseDragEvent);
+    event.preventDefault();
+    event.stopImmediatePropagation();
   };
 }

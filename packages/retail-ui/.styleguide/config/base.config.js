@@ -63,18 +63,15 @@ const styles = {
       fontSize: '16px',
       margin: 0,
       '& a': {
+        color: '#e5e5e5 !important',
+        padding: '7px 0 9px 40px !important',
+        display: 'inline-block !important',
+        width: '100% !important',
+        cursor: 'pointer !important',
         '&:visited': {
           color: '#e5e5e5',
         },
         '&:link': {
-          fontSize: '16px',
-          color: '#e5e5e5',
-          paddingLeft: 40,
-          paddingTop: 7,
-          paddingBottom: 9,
-          display: 'inline-block',
-          width: '100%',
-          cursor: 'pointer',
         },
         '&:hover': {
           color: '#fff',

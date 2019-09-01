@@ -6,8 +6,8 @@ export const inputNumber = (
   prev: InternalDateComponentRaw,
   key: string,
   inputMode: boolean,
-  cb: (next: InternalDateComponent, inputMode: boolean) => void,
-) => {
+  cb?: (type: InternalDateComponentType | null, next: InternalDateComponent, inputMode: boolean) => void,
+): { type: InternalDateComponentType | null; value: InternalDateComponent; inputMode: boolean } => {
   let nextInputMode = false;
   let next: any;
   let first: number = 10;
@@ -27,5 +27,6 @@ export const inputNumber = (
     next = `${prev === null ? '' : prev}${key}`.slice(-length);
     nextInputMode = next.length < length;
   }
-  cb(next, nextInputMode);
+  cb && cb(type, next, nextInputMode);
+  return { type, value: next, inputMode: nextInputMode };
 };

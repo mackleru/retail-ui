@@ -259,9 +259,8 @@ export class InternalDate {
   public toString(settings: InternalDateToFragmentsSettings = {}): string {
     return this.toFragments({ withPad: true, withSeparator: true, ...settings })
       .filter(({ value }) => value !== null)
-      .map(
-        ({ type, valueWithPad, value }) =>
-          settings.withPad && type !== InternalDateComponentType.Separator ? valueWithPad : value,
+      .map(({ type, valueWithPad, value }) =>
+        settings.withPad && type !== InternalDateComponentType.Separator ? valueWithPad : value,
       )
       .join('');
   }
@@ -285,6 +284,10 @@ export class InternalDate {
       .setRangeEnd(this.end && this.end.clone());
   }
 
+  public duplicateOf(pattern: InternalDate): InternalDate {
+    return this.setComponents(pattern.getComponentsRaw());
+  }
+
   public restore(type: InternalDateComponentType | null = null): InternalDate {
     const prev = this.getComponentsRaw();
     const today = InternalDateGetter.getTodayComponents();
@@ -301,13 +304,25 @@ export class InternalDate {
             ? Number(prev.year) + 2000
             : prev.year
         : today.year;
-    if ((type === null && restoreYear !== prev.year) || type === InternalDateComponentType.Year) {
+    if (
+      (type === null && restoreYear !== prev.year) ||
+      type === InternalDateComponentType.Year ||
+      type === InternalDateComponentType.All
+    ) {
       this.setYear(restoreYear);
     }
-    if ((type === null && prev.month === null) || type === InternalDateComponentType.Month) {
+    if (
+      (type === null && prev.month === null) ||
+      type === InternalDateComponentType.Month ||
+      type === InternalDateComponentType.All
+    ) {
       this.setMonth(today.month);
     }
-    if ((type === null && prev.date === null) || type === InternalDateComponentType.Date) {
+    if (
+      (type === null && prev.date === null) ||
+      type === InternalDateComponentType.Date ||
+      type === InternalDateComponentType.All
+    ) {
       this.setDate(today.date);
     }
     return this;
@@ -332,6 +347,21 @@ export class InternalDate {
 
   public isEmpty(): boolean {
     return Object.values(this.components).every(component => component === null);
+  }
+
+  public isIncomplete(): boolean {
+    return !this.isEmpty() && Object.values(this.components).some(component => component === null);
+  }
+
+  public isEqualComponentDate(type: InternalDateComponentType | null, compared: InternalDate): boolean {
+    return this.get(type) === compared.get(type);
+  }
+
+  public isEqual(compared: InternalDate): boolean {
+    return (
+      InternalDateValidator.isMatchDateValues(this, compared) &&
+      InternalDateValidator.isMatchDateFormats(this, compared)
+    );
   }
 
   private getMinValue(type: InternalDateComponentType, isRange?: boolean): number {

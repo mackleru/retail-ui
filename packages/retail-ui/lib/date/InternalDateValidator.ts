@@ -1,3 +1,4 @@
+import { InternalDate } from './InternalDate';
 import InternalDateGetter from './InternalDateGetter';
 import {
   InternalDateComponentRaw,
@@ -81,5 +82,13 @@ export default class InternalDateValidator {
 
   public static testParseToNumber(value: InternalDateComponentRaw): boolean {
     return value !== null && (typeof value === 'number' || !Number.isNaN(parseInt(value, 10)));
+  }
+
+  public static isMatchDateValues(a: InternalDate, b: InternalDate): boolean {
+    return a.toInternalString() === b.toInternalString();
+  }
+
+  public static isMatchDateFormats(a: InternalDate, b: InternalDate): boolean {
+    return a.getOrder() === b.getOrder() && a.getSeparator() === b.getSeparator();
   }
 }

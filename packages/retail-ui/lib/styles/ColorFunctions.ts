@@ -47,6 +47,19 @@ const ColorFunctions = {
     }
     return ColorFunctionsCache[key]!;
   },
+  fade(colorString: string, amount: number | string) {
+    const key = buildCacheKey('fade', colorString);
+    if (ColorFunctionsCache[key] !== undefined) {
+      return ColorFunctionsCache[key];
+    }
+    const color = new ColorObject(
+      [ColorFunctions.red(colorString), ColorFunctions.green(colorString), ColorFunctions.blue(colorString)],
+      normalizeAmount(amount),
+      'rgba',
+    );
+    ColorFunctionsCache[key] = color.toRGBString();
+    return ColorFunctionsCache[key];
+  },
   red(colorString: string) {
     const color = ColorFactory.create(colorString);
     return color.rgb[0];
@@ -87,14 +100,7 @@ function shiftColor(colorString: string, a: number | string, sign: SignType, met
     return 'transparent';
   }
 
-  let amount: number;
-  if (typeof a === 'string') {
-    amount = a.endsWith('%') ? floatFromPercent(a) : parseFloat(a);
-  } else {
-    amount = a;
-  }
-  amount = clamp(amount, 1);
-
+  const amount = normalizeAmount(a);
   const color = ColorFactory.create(colorString);
   const hsl = color.toHSL();
 
@@ -125,6 +131,16 @@ function shiftColor(colorString: string, a: number | string, sign: SignType, met
     default:
       return newColor.toHEXString();
   }
+}
+
+function normalizeAmount(a: string | number): number {
+  let amount: number;
+  if (typeof a === 'string') {
+    amount = a.endsWith('%') ? floatFromPercent(a) : parseFloat(a);
+  } else {
+    amount = a;
+  }
+  return clamp(amount, 1);
 }
 
 export default ColorFunctions;

@@ -3,7 +3,7 @@
 ```
 
 ```jsx
-<DateInput value={state.value} onChange={(_, v) => setState({ value: v })} />
+<DateInput value={state.value} onChange={(_, v) => {setState({ v }); console.log("value", v);}} />
 ```
 
 ```jsx
